@@ -18,12 +18,16 @@ PACKAGE_REGEXES: list[re.Pattern] = [
 ]
 
 
-def trim_package(input: str) -> str:
+def format_package(input: str) -> str:
     for expression in PACKAGE_REGEXES:
         match = expression.match(input)
         if match is not None:
             return match.group("value")
     return input
+
+
+def format_value(input: str) -> str:
+    return input.replace("µ", "u").replace("Ω", "")
 
 
 def format_position(input: str) -> str:
@@ -52,12 +56,12 @@ KiCad fields along with an optional transformation function.
 """
 FIELDS_MAP: dict[str, tuple[str, Callable[[str], str] | None]] = {
     "Designator": ("Ref", None),
-    "Footprint": ("Package", trim_package),
+    "Footprint": ("Package", format_package),
     "Mid X": ("PosX", format_position),
     "Mid Y": ("PosY", format_position),
     "Layer": ("Side", map_layer),
     "Rotation": ("Rot", format_rotation),
-    "Comment": ("Val", None),
+    "Comment": ("Val", format_value),
 }
 
 
