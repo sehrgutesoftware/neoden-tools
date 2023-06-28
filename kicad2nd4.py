@@ -10,13 +10,19 @@ import re
 from io import TextIOWrapper
 from typing import Callable
 
-PASSIVES_REGEX = re.compile(r'\w_(?P<size>\d+)_\d+Metric')
+PACKAGE_REGEXES: list[re.Pattern] = [
+    re.compile(r'\w+_(?P<value>\d+)_\d+Metric'),
+    re.compile(r'(?P<value>SOIC\-8).*'),
+    re.compile(r'(?P<value>Fiducial)_.*'),
+    re.compile(r'R_Array_Convex_(?P<value>\d+x\d+)'),
+]
 
 
 def trim_package(input: str) -> str:
-    match = PASSIVES_REGEX.match(input)
-    if match is not None:
-        return match.group("size")
+    for expression in PACKAGE_REGEXES:
+        match = expression.match(input)
+        if match is not None:
+            return match.group("value")
     return input
 
 
